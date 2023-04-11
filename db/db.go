@@ -5,20 +5,27 @@ import (
 	"fmt"
 
 	"bookStore/config"
-	"bookStore/models"
 )
 
 type PostgresDBMSImpl struct {
 	DB *sql.DB
 }
 
+// Book holds all info related to a book
+type Book struct {
+	BookID string  `json:"bookId"`
+	Name   string  `json:"name"`
+	Author string  `json:"author"`
+	Price  float64 `json:"price"`
+}
+
 //go:generate mockery --name=DBMS --case=underscore
 type DBMS interface {
-	AddBook(book *models.Book) error
-	GetAllBooks() ([]*models.Book, error)
-	GetBook(bookID string) (*models.Book, error)
+	AddBook(book *Book) error
+	GetAllBooks() ([]*Book, error)
+	GetBook(bookID string) (*Book, error)
 	DeleteBook(bookID string) (int, error)
-	UpdateBook(book *models.Book) (int, error)
+	UpdateBook(book *Book) (int, error)
 }
 
 func NewPostgresDBMSImpl() DBMS {
