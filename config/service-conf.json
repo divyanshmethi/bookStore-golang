@@ -1,0 +1,11 @@
+{
+  "Data": {
+    "Postgres": {
+      "Host": "127.0.0.1",
+      "Port": "5433",
+      "User": "postgres",
+      "Password": "9314056247",
+      "DBName": "bookStore"
+    }
+  }
+}
