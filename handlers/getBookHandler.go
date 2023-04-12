@@ -1,31 +1,25 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
-// Todo: Set correct response codes for all cases
-// Todo: Interconversion between layers
-func (service *BookStore) GetBook(w http.ResponseWriter, r *http.Request) {
-	r.Header.Set("Content-Type", "application/json")
-	headerVars := mux.Vars(r)
-	if headerVars == nil || headerVars["bookId"] == "" {
-		w.WriteHeader(400)
-		_ = json.NewEncoder(w).Encode("Invalid request")
+func (service *BookStore) GetBook(context *gin.Context) {
+	context.Request.Header.Set("Content-Type", "application/json")
+	if context.Param("bookId") == "" {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
-	res, err := service.controller.GetBook(headerVars["bookId"])
+	res, err := service.controller.GetBook(context.Param("bookId"))
 	if err != nil {
-		w.WriteHeader(500)
-		_ = json.NewEncoder(w).Encode(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	if res == nil {
-		_ = json.NewEncoder(w).Encode("No records found")
+		context.String(http.StatusOK, "No records found")
 		return
 	}
-	_ = json.NewEncoder(w).Encode(res)
+	context.JSON(http.StatusOK, res)
 }

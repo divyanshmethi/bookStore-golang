@@ -1,29 +1,28 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 )
 
-func (service *BookStore) DeleteBook(w http.ResponseWriter, r *http.Request) {
-	r.Header.Set("Content-Type", "application/json")
-	headerVars := mux.Vars(r)
-	if headerVars == nil || headerVars["bookId"] == "" {
-		w.WriteHeader(400)
-		_ = json.NewEncoder(w).Encode("Invalid request")
+// Todo: Use gorm
+// Todo: Check if we want to propogate the context to lower functions as well
+func (service *BookStore) DeleteBook(context *gin.Context) {
+	context.Request.Header.Set("Content-Type", "application/json")
+	if context.Param("bookId") == "" {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Invalid request"})
 		return
 	}
-	rowsAffected, err := service.controller.DeleteBook(headerVars["bookId"])
+	rowsAffected, err := service.controller.DeleteBook(context.Param("bookId"))
 	if err != nil {
-		w.WriteHeader(500)
-		_ = json.NewEncoder(w).Encode(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"error": "Invalid request"})
 		return
 	}
 	if rowsAffected == 0 {
-		_ = json.NewEncoder(w).Encode("No records found to be deleted")
+		context.String(http.StatusOK, "No records found to be deleted")
 		return
 	}
-	_ = json.NewEncoder(w).Encode("Book Deleted Successfully")
+	//Todo: Check if want to return the deleted record or id of deleted record
+	context.String(http.StatusOK, "Book Deleted Successfully")
 }

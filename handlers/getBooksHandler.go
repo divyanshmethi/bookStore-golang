@@ -1,21 +1,21 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (service *BookStore) GetBooks(w http.ResponseWriter, r *http.Request) {
-	r.Header.Set("Content-Type", "application/json")
+func (service *BookStore) GetBooks(context *gin.Context) {
+	context.Request.Header.Set("Content-Type", "application/json")
 	res, err := service.controller.GetAllBooks()
 	if err != nil {
-		w.WriteHeader(500)
-		_ = json.NewEncoder(w).Encode(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 	if res == nil {
-		_ = json.NewEncoder(w).Encode("No records found")
+		context.String(http.StatusOK, "No records found")
 		return
 	}
-	_ = json.NewEncoder(w).Encode(res)
+	context.JSON(http.StatusOK, res)
 }
