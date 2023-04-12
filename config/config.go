@@ -5,6 +5,10 @@ import (
 	"os"
 )
 
+const (
+	ConfigFilePath = "/Users/divyansh.methi/GolandProjects/bookStore/config/service-conf.json"
+)
+
 var globalConfig *AppConfig
 
 type Postgres struct {
@@ -24,8 +28,7 @@ type AppConfig struct {
 }
 
 func InitGlobalConfig() {
-	//Todo: Find better way to do this
-	file, _ := os.Open("/Users/divyansh.methi/GolandProjects/bookStore/config/service-conf.json")
+	file, _ := os.Open(ConfigFilePath)
 	defer file.Close()
 	decoder := json.NewDecoder(file)
 	err := decoder.Decode(&globalConfig)

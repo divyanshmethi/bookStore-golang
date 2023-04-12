@@ -8,8 +8,6 @@ import (
 )
 
 func main() {
-	//Todo: Fetch config here and inject into the server
-	//appCfg := &config.AppConfig{}
 	config.InitGlobalConfig()
 
 	//init our DB
