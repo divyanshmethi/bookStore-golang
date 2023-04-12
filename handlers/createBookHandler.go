@@ -1,25 +1,23 @@
 package handlers
 
 import (
-	"encoding/json"
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (service *BookStore) CreateBook(w http.ResponseWriter, r *http.Request) {
-	r.Header.Set("Content-Type", "application/json")
-	var book *Book
-	if err := json.NewDecoder(r.Body).Decode(&book); err != nil {
-		w.WriteHeader(400)
-		_ = json.NewEncoder(w).Encode("Unable to read the provided book Information")
+func (service *BookStore) CreateBook(context *gin.Context) {
+	context.Request.Header.Set("Content-Type", "application/json")
+	var book Book
+	if err := context.ShouldBindJSON(&book); err != nil {
+		context.JSON(http.StatusBadRequest, gin.H{"error": "Unable to read the provided book Information"})
 		return
 	}
-	defer r.Body.Close()
-	controllerReq := toControllerReq(book)
+	controllerReq := toControllerReq(&book)
 	err := service.controller.CreateBook(controllerReq)
 	if err != nil {
-		w.WriteHeader(500)
-		_ = json.NewEncoder(w).Encode(err)
+		context.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	_ = json.NewEncoder(w).Encode("Book Added Successfully")
+	context.String(http.StatusCreated, "Book Added Successfully")
 }
